@@ -72,7 +72,7 @@ const Reportes = () => {
                   <span className="text-sm text-gray-500">Pendientes</span>
                 </div>
                 <p className="text-3xl font-bold text-yellow-600">
-                  {parseInt(estadisticas.pedidos_pendientes) + parseInt(estadisticas.pedidos_en_proceso)}
+                  {(Number(estadisticas.pedidos_pendientes) || 0) + (Number(estadisticas.pedidos_en_proceso) || 0)}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">En Proceso/Pendientes</p>
               </div>

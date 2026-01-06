@@ -106,14 +106,21 @@ const Usuario = {
   },
 
   async getRepartidoresDisponibles() {
+    // Buscar repartidor con menos pedidos activos (pendientes o en proceso)
     const result = await db.query(
-      `SELECT id, nombre FROM usuarios 
-       WHERE rol = 'repartidor' AND activo = true 
-       ORDER BY RANDOM() 
+      `SELECT u.id, u.nombre, COUNT(p.id) as pedidos_activos
+       FROM usuarios u
+       LEFT JOIN pedidos p ON u.id = p.repartidor_id 
+         AND p.estado IN ('pendiente', 'en_proceso')
+       WHERE u.rol = 'repartidor' AND u.activo = true
+       GROUP BY u.id, u.nombre
+       ORDER BY pedidos_activos ASC, RANDOM()
        LIMIT 1`
     );
     return result.rows[0];
-  }
+  },
+
+  query: (text, params) => db.query(text, params)
 };
 
 module.exports = Usuario;

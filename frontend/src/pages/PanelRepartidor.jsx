@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { pedidoService } from '../services';
 import Navbar from '../components/Navbar';
 import EstadoBadge from '../components/EstadoBadge';
+import { useToast } from '../components/Toast';
 import { FiRefreshCw, FiMapPin, FiDollarSign, FiPhone } from 'react-icons/fi';
 
 const PanelRepartidor = () => {
@@ -9,6 +10,7 @@ const PanelRepartidor = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [updating, setUpdating] = useState(null);
+  const { showToast, ToastContainer } = useToast();
 
   const fetchPedidos = async () => {
     try {
@@ -33,8 +35,9 @@ const PanelRepartidor = () => {
       setUpdating(pedidoId);
       await pedidoService.updateEstado(pedidoId, nuevoEstado);
       await fetchPedidos();
+      showToast('Estado actualizado exitosamente', 'success');
     } catch (err) {
-      alert('Error al actualizar estado: ' + (err.response?.data?.error || err.message));
+      showToast('Error al actualizar estado: ' + (err.response?.data?.error || err.message), 'error');
     } finally {
       setUpdating(null);
     }
@@ -66,6 +69,7 @@ const PanelRepartidor = () => {
   return (
     <>
       <Navbar />
+      <ToastContainer />
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Mis Pedidos</h1>

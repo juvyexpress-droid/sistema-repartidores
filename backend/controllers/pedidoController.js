@@ -51,23 +51,29 @@ const pedidoController = {
         return res.status(400).json({ error: 'Dirección, productos y total son requeridos' });
       }
 
-      // Buscar o crear cliente
+      // Buscar o crear cliente por teléfono
       let cliente_id = null;
       if (telefono_cliente) {
-        let cliente = await Usuario.findByEmail(`${telefono_cliente}@whatsapp.com`);
+        // Buscar cliente por teléfono primero
+        const result = await Usuario.query(
+          'SELECT id FROM usuarios WHERE telefono = $1 LIMIT 1',
+          [telefono_cliente]
+        );
         
-        if (!cliente) {
+        if (result.rows.length > 0) {
+          cliente_id = result.rows[0].id;
+        } else {
           // Crear cliente automáticamente desde WhatsApp
-          cliente = await Usuario.create({
+          const cliente = await Usuario.create({
             nombre: cliente_nombre || 'Cliente WhatsApp',
-            email: `${telefono_cliente}@whatsapp.com`,
+            email: `whatsapp_${telefono_cliente}@sistema.local`,
             telefono: telefono_cliente,
             rol: 'cliente',
             direccion: direccion_entrega,
             activo: true
           });
+          cliente_id = cliente.id;
         }
-        cliente_id = cliente.id;
       }
 
       // Asignar repartidor automáticamente
